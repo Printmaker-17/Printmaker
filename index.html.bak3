@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1D9E75">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Printmaker">
+<meta name="description" content="Print shop management — work orders, materials, pricing, quotes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Printmaker IAPP</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<style>
+:root{--teal:#1D9E75;--teal-dark:#0F6E56;--teal-light:#E1F5EE;--teal-mid:#9FE1CB;--bg:#F7F8F6;--surface:#FFFFFF;--surface2:#F2F4F1;--border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);--text:#1A1E1A;--text2:#5A6359;--text3:#8E9B8D;--danger:#DC3545;--danger-bg:#FEF0F0;--danger-bdr:rgba(220,53,69,.25);--excel:#1D6F42;--excel-bg:#EBF5EE;--excel-bdr:rgba(29,111,66,.3);--radius:10px;--radius-sm:6px;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);--font:'DM Sans',system-ui,sans-serif;--mono:'DM Mono',monospace;--sidebar-w:210px;--topbar-h:52px;--safe-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root{--bg:#111512;--surface:#1A1E1A;--surface2:#242824;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#E8EDE8;--text2:#8FA08E;--text3:#5A6A59;--teal-light:rgba(29,158,117,.15);--teal-mid:rgba(29,158,117,.4);--excel-bg:rgba(29,111,66,.15);--danger-bg:rgba(220,53,69,.1)}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+input,select,textarea,button{font-family:var(--font);font-size:13px;color:var(--text)}
+input,select,textarea{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(29,158,117,.12)}
+input.err,select.err{border-color:var(--danger)!important;background:rgba(220,53,69,.04)}
+textarea{resize:vertical;min-height:52px;line-height:1.5}
+a{color:var(--teal);text-decoration:none}
+.app{display:flex;height:100vh;height:100dvh}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;padding-bottom:var(--safe-bottom)}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:16px 18px 14px;border-bottom:1px solid var(--border)}
+.sb-brand-icon{width:32px;height:32px;border-radius:8px;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-brand-icon i{color:#fff;font-size:17px}
+.sb-brand-text h1{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.01em;line-height:1.2}
+.sb-brand-text p{font-size:10px;color:var(--text3);margin-top:1px}
+.sb-section{padding:8px 0 4px}
+.sb-section-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;padding:0 18px 6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 18px;font-size:13px;color:var(--text2);cursor:pointer;transition:background .12s;border-left:2px solid transparent;user-select:none}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--teal-light);color:var(--teal-dark);font-weight:500;border-left-color:var(--teal)}
+.nav-item i{font-size:15px;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:var(--topbar-h);min-height:var(--topbar-h);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
+.topbar h2{font-size:15px;font-weight:600;color:var(--text);white-space:nowrap}
+.content{flex:1;overflow-y:auto;padding:18px 20px;padding-bottom:calc(18px + var(--safe-bottom))}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:12px;font-weight:500;cursor:pointer;transition:background .12s,border-color .12s;white-space:nowrap;line-height:1}
+.btn:hover{background:var(--surface2)}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn-primary:hover{background:var(--teal-dark);border-color:var(--teal-dark)}
+.btn-danger{background:var(--danger-bg);border-color:var(--danger-bdr);color:var(--danger)}
+.btn-excel{background:var(--excel-bg);border-color:var(--excel-bdr);color:var(--excel)}
+.btn-sm{padding:5px 9px;font-size:11px;gap:4px}
+.btn-xs{padding:3px 7px;font-size:10px;gap:3px}
+.btn i{font-size:14px}
+.btn-sm i{font-size:13px}
+.actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.icon-btn{width:28px;height:28px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s}
+.icon-btn:hover{background:var(--surface2);color:var(--text)}
+.icon-btn.danger:hover{background:var(--danger-bg);border-color:var(--danger-bdr);color:var(--danger)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.sec-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+.metric-label{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.metric-value{font-size:22px;font-weight:600;color:var(--text);letter-spacing:-.02em}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.tbl th{text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:0 10px 10px;border-bottom:1px solid var(--border)}
+.tbl td{padding:10px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:var(--surface2)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+.badge-amber{background:#FFF3CD;color:#856404}
+.badge-blue{background:#CFE2FF;color:#084298}
+.badge-green{background:#D1E7DD;color:#0A3622}
+.badge-red{background:#F8D7DA;color:#842029}
+.badge-teal{background:var(--teal-light);color:var(--teal-dark)}
+@media(prefers-color-scheme:dark){.badge-amber{background:rgba(133,100,4,.25);color:#FFC107}.badge-blue{background:rgba(8,66,152,.35);color:#90CAFF}.badge-green{background:rgba(10,54,34,.4);color:#75E09A}.badge-red{background:rgba(132,32,41,.3);color:#FF8B92}}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-row.three{grid-template-columns:1fr 1fr 1fr}
+.form-row.four{grid-template-columns:1fr 1fr 1fr 1fr}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:11px;font-weight:500;color:var(--text2)}
+.search-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.search-bar i{color:var(--text3);font-size:16px;flex-shrink:0}
+.search-bar input{flex:1}
+.li-hdr,.li-row{display:grid;grid-template-columns:2fr 68px 82px 82px 30px;gap:6px;align-items:center}
+.li-hdr{margin-bottom:6px}
+.li-hdr span{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+.li-row{margin-bottom:6px}
+.total-section{padding-top:12px;border-top:1px solid var(--border);margin-top:6px}
+.total-row{display:flex;justify-content:flex-end;align-items:center;gap:16px;padding:3px 0}
+.total-label{font-size:12px;color:var(--text2);min-width:80px;text-align:right}
+.total-val{font-size:13px;font-weight:500;color:var(--text);min-width:80px;text-align:right}
+.inline-form{display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px}
+.inline-form.open{display:block}
+.hidden{display:none!important}
+.empty{text-align:center;padding:44px 20px;color:var(--text3)}
+.empty i{font-size:36px;margin-bottom:12px;display:block;opacity:.5}
+.empty p{font-size:13px}
+.wo-id{font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:500}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:var(--teal-dark);flex-shrink:0;border:1px solid var(--teal-mid)}
+.client-card-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;background:var(--surface);box-shadow:var(--shadow);cursor:pointer;transition:background .12s}
+.client-card-row:hover{background:var(--surface2)}
+.jt-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:7px;background:var(--surface);transition:box-shadow .12s}
+.jt-item:hover{box-shadow:var(--shadow)}
+.jt-drag{cursor:grab;color:var(--text3);font-size:16px;flex-shrink:0}
+.jt-drag:active{cursor:grabbing}
+.tog-group{display:flex;border:1px solid var(--border2);border-radius:var(--radius-sm);overflow:hidden}
+.tog{flex:1;padding:7px 8px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;background:var(--surface);color:var(--text2);border-right:1px solid var(--border2);transition:all .12s;user-select:none}
+.tog:last-child{border-right:none}
+.tog.on{background:var(--teal);color:#fff}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+.formula-box{font-size:11px;color:var(--text2);padding:8px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-top:8px;font-family:var(--mono);line-height:1.6}
+.job-block{border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;margin-bottom:10px;background:var(--surface2)}
+.job-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.search-wrap{position:relative}
+.search-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);z-index:100;box-shadow:var(--shadow-md);max-height:220px;overflow-y:auto}
+.sd-item{padding:9px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;transition:background .1s}
+.sd-item:last-child{border-bottom:none}
+.sd-item:hover,.sd-item.focused{background:var(--surface2)}
+.sd-av{width:28px;height:28px;border-radius:50%;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--teal-dark);flex-shrink:0}
+.sd-av.new-av{background:var(--surface2);color:var(--text3)}
+.client-selected-card{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-top:8px}
+.new-client-block{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;margin-top:10px}
+.quote-out{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:14px}
+.q-hdr{background:var(--teal);padding:14px 18px}
+.q-body{padding:16px 18px}
+.q-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border)}
+.q-row:last-child{border-bottom:none}
+.q-job-block{border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px}
+.q-job-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.sub-section{border-top:1px solid var(--border);margin-top:12px;padding-top:10px}
+.sub-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;color:var(--text2)}
+.sub-row.tax{color:var(--text)}
+.q-total-row{display:flex;justify-content:space-between;align-items:center;padding-top:10px;margin-top:6px;border-top:1px solid var(--border)}
+.internal-note{background:rgba(186,117,23,.08);border:1px solid rgba(186,117,23,.25);border-radius:var(--radius-sm);padding:10px 13px;font-size:11px;color:#854F0B;display:flex;gap:8px;align-items:flex-start;margin-top:12px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(2px);padding:16px}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:580px;max-width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:var(--shadow-md)}
+.modal-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-hdr h3{font-size:15px;font-weight:600}
+.modal-body{flex:1;overflow-y:auto;padding:16px 20px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
+.banner{border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;display:flex;align-items:flex-start;gap:10px;font-size:12px;line-height:1.5}
+.banner-success{background:var(--teal-light);border:1px solid var(--teal-mid);color:var(--teal-dark)}
+.banner-error{background:var(--danger-bg);border:1px solid var(--danger-bdr);color:var(--danger)}
+.req{color:var(--danger);font-size:10px;margin-left:3px}
+.opt{font-size:10px;font-weight:400;color:var(--text3);font-style:italic;margin-left:3px}
+#install-toast{position:fixed;bottom:calc(20px + var(--safe-bottom));right:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow-md);z-index:300;max-width:300px;display:flex;flex-direction:column;gap:10px;font-size:13px;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.sb-install-area{padding:12px;display:none}
+.sb-install-banner{background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:var(--teal-dark);display:flex;flex-direction:column;gap:6px}
+.sb-install-banner button{background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);padding:6px 10px;font-size:11px;font-weight:500;cursor:pointer;width:100%}
+.sb-footer{padding:12px 18px 16px;font-size:10px;color:var(--text3)}
+.menu-btn{display:none}
+/* ── QUOTE PANEL ── */
+.quote-view-wrap{display:flex;flex:1;overflow:hidden;min-width:0}
+.quote-panel{width:230px;min-width:230px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.qp-hdr{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.qp-hdr h3{font-size:12px;font-weight:600;color:var(--text)}
+.qp-search{padding:8px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.qp-search input{font-size:12px;padding:5px 9px}
+.qp-list{flex:1;overflow-y:auto;padding:8px}
+.qi{padding:9px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;cursor:pointer;transition:all .12s;background:var(--surface)}
+.qi:hover{background:var(--surface2)}
+.qi.active{background:var(--teal-light);border-color:var(--teal-mid)}
+.qi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.qi-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
+.qi-total{font-size:12px;font-weight:600;color:var(--teal-dark)}
+.qi-meta{font-size:10px;color:var(--text3);margin-bottom:3px}
+.qi-actions{display:flex;gap:4px;margin-top:5px;opacity:0;transition:opacity .12s}
+.qi:hover .qi-actions,.qi.active .qi-actions{opacity:1}
+.quote-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.qstatus-sel{font-size:11px;padding:4px 8px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);cursor:pointer}
+.badge-draft{background:#FFF3CD;color:#856404}
+.badge-sent{background:#CFE2FF;color:#084298}
+.badge-accepted{background:#D1E7DD;color:#0A3622}
+.badge-declined{background:#F8D7DA;color:#842029}
+.transfer-box{background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:var(--radius);padding:14px 16px;margin-top:12px}
+.transfer-box h4{font-size:12px;font-weight:600;color:var(--teal-dark);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.transfer-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(29,158,117,.15)}
+.transfer-row:last-of-type{border-bottom:none}
+.q-empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;color:var(--text3);text-align:center}
+.q-empty-state i{font-size:36px;margin-bottom:12px;opacity:.4}
+@media(max-width:700px){
+  :root{--sidebar-w:0px}
+  .sidebar{position:fixed;left:-220px;top:0;bottom:0;width:220px;z-index:150;transition:left .25s ease}
+  .sidebar.open{left:0;box-shadow:var(--shadow-md)}
+  .mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:140}
+  .mobile-overlay.show{display:block}
+  .menu-btn{display:inline-flex}
+  .content{padding:12px 14px}
+  .metric-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .form-row.three,.form-row.four{grid-template-columns:1fr 1fr}
+}
+@media(min-width:701px){.menu-btn{display:none!important}.mobile-overlay{display:none!important}}
+</style>
+</head>
+<body>
+<input type="file" id="xlsx-input" accept=".xlsx,.xls" style="display:none" onchange="handleXlsxFile(this)">
+<div id="mobile-overlay" class="mobile-overlay" onclick="closeMobileMenu()"></div>
+<div class="app">
+<nav class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-icon"><i class="ti ti-printer" aria-hidden="true"></i></div>
+    <div class="sb-brand-text"><h1>Printmaker IAPP</h1><p>Shop Management</p></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-label">Orders</div>
+    <div class="nav-item active" onclick="showView('orders');closeMobileMenu()" id="nav-orders"><i class="ti ti-clipboard-list"></i>Work orders</div>
+    <div class="nav-item" onclick="showView('new-order');closeMobileMenu()" id="nav-new-order"><i class="ti ti-plus"></i>New order</div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-label">Tools</div>
+    <div class="nav-item" onclick="showView('quote');closeMobileMenu()" id="nav-quote"><i class="ti ti-calculator"></i>Quote builder</div>
+    <div class="nav-item" onclick="showView('clients');closeMobileMenu()" id="nav-clients"><i class="ti ti-users"></i>Clients</div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-label">Catalog</div>
+    <div class="nav-item" onclick="showView('jobtypes');closeMobileMenu()" id="nav-jobtypes"><i class="ti ti-layout-list"></i>Job types</div>
+    <div class="nav-item" onclick="showView('materials');closeMobileMenu()" id="nav-materials"><i class="ti ti-box"></i>Materials</div>
+    <div class="nav-item" onclick="showView('pricing');closeMobileMenu()" id="nav-pricing"><i class="ti ti-tag"></i>Pricing rules</div>
+    <div class="nav-item" onclick="showView('printpricing');closeMobileMenu()" id="nav-printpricing"><i class="ti ti-printer"></i>Print pricing</div>
+    <div class="nav-item" onclick="showView('sizes');closeMobileMenu()" id="nav-sizes"><i class="ti ti-ruler"></i>Sizes</div>
+  </div>
+  <div style="flex:1"></div>
+  <div class="sb-install-area" id="sb-install-area">
+    <div class="sb-install-banner">
+      <strong>Install app</strong>
+      <p style="font-size:11px;line-height:1.4;margin-top:2px">Add Printmaker IAPP to your home screen for quick access and offline use.</p>
+      <button onclick="triggerInstall()">Install Printmaker IAPP</button>
+    </div>
+  </div>
+  <div class="sb-footer">Printmaker IAPP v2.0 · Works offline</div>
+</nav>
+<div class="main">
+
+<!-- ORDERS -->
+<div id="view-orders">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn menu-btn" onclick="openMobileMenu()"><i class="ti ti-menu-2"></i></button>
+      <h2>Work orders</h2>
+    </div>
+    <button class="btn btn-primary" onclick="showView('new-order')"><i class="ti ti-plus"></i>New order</button>
+  </div>
+  <div class="content">
+    <div class="metric-grid">
+      <div class="metric"><div class="metric-label">Total</div><div class="metric-value" id="stat-total">0</div></div>
+      <div class="metric"><div class="metric-label">In progress</div><div class="metric-value" id="stat-prog">0</div></div>
+      <div class="metric"><div class="metric-label">Completed</div><div class="metric-value" id="stat-done">0</div></div>
+      <div class="metric"><div class="metric-label">Revenue</div><div class="metric-value" id="stat-rev">$0</div></div>
+    </div>
+    <div class="card">
+      <div class="search-bar">
+        <i class="ti ti-search"></i>
+        <input type="text" placeholder="Search orders…" id="o-search" oninput="renderOrders()">
+        <select onchange="renderOrders()" id="o-filter" style="width:130px">
+          <option value="">All statuses</option><option>Pending</option><option>In Progress</option><option>Completed</option><option>Cancelled</option>
+        </select>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl"><thead><tr>
+          <th style="width:78px">Order #</th><th style="width:130px">Client</th><th style="width:110px">Job type</th>
+          <th style="width:90px">Due</th><th style="width:80px">Total</th><th style="width:92px">Status</th><th style="width:130px">Actions</th>
+        </tr></thead><tbody id="orders-body"></tbody></table>
+      </div>
+      <div id="orders-empty" class="empty hidden"><i class="ti ti-clipboard"></i><p>No orders yet. <a href="#" onclick="showView('new-order');return false">Create your first one.</a></p></div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW/EDIT ORDER -->
+<div id="view-new-order" class="hidden">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn menu-btn" onclick="openMobileMenu()"><i class="ti ti-menu-2"></i></button>
+      <h2 id="o-form-title">New work order</h2>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="showView('orders')">Cancel</button>
+      <button class="btn" onclick="exportOrderPDF()"><i class="ti ti-file-type-pdf"></i>PDF</button>
+      <button class="btn btn-primary" onclick="saveOrder()"><i class="ti ti-device-floppy"></i>Save</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="sec-title">Client & job details</div>
+      <div class="form-row">
+        <div class="fg"><label>Client name</label><input type="text" id="f-client" placeholder="e.g. Acme Corp"></div>
+        <div class="fg"><label>Contact / phone</label><input type="text" id="f-contact" placeholder="e.g. Maria — (787) 555-0100"></div>
+      </div>
+      <div class="form-row three">
+        <div class="fg"><label>Job type</label><select id="f-jobtype"></select></div>
+        <div class="fg"><label>Due date</label><input type="date" id="f-duedate"></div>
+        <div class="fg"><label>Status</label><select id="f-status"><option>Pending</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select></div>
+      </div>
+      <div class="fg"><label>Notes</label><textarea id="f-notes" placeholder="Colors, finishing, file specs, delivery…"></textarea></div>
+    </div>
+    <div class="card">
+      <div class="sec-title">Line items</div>
+      <div class="li-hdr"><span>Description</span><span>Qty</span><span>Unit $</span><span>Subtotal</span><span></span></div>
+      <div id="li-container"></div>
+      <button class="btn btn-sm" onclick="addLI()" style="margin-top:4px"><i class="ti ti-plus"></i>Add item</button>
+      <div class="total-section">
+        <div class="total-row"><span class="total-label">Subtotal</span><span class="total-val" id="f-sub">$0.00</span></div>
+        <div class="total-row"><span class="total-label">Tax (11.5%)</span><span class="total-val" id="f-tax">$0.00</span></div>
+        <div class="total-row" style="margin-top:6px;padding-top:8px;border-top:1px solid var(--border)">
+          <span style="font-size:13px;font-weight:600;color:var(--text);min-width:80px;text-align:right">Total</span>
+          <span style="font-size:20px;font-weight:700;color:var(--text);min-width:80px;text-align:right" id="f-total">$0.00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE BUILDER -->
+<div id="view-quote" class="hidden">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn menu-btn" onclick="openMobileMenu()"><i class="ti ti-menu-2"></i></button>
+      <h2>Quotes</h2>
+    </div>
+    <button class="btn btn-primary" onclick="newQuote()"><i class="ti ti-plus"></i>New quote</button>
+  </div>
+  <div class="quote-view-wrap">
+    <!-- LEFT PANEL: quote list -->
+    <div class="quote-panel">
+      <div class="qp-hdr">
+        <h3>Saved quotes <span id="q-count-badge" class="badge badge-teal" style="margin-left:4px">0</span></h3>
+      </div>
+      <div class="qp-search">
+        <input type="text" placeholder="Search by client…" id="qp-search" oninput="renderQPanel()">
+      </div>
+      <div class="qp-list" id="qp-list">
+        <div class="q-empty-state"><i class="ti ti-receipt"></i><p>No quotes yet.<br>Click "New quote" to start.</p></div>
+      </div>
+    </div>
+    <!-- RIGHT: quote editor -->
+    <div class="quote-main">
+      <!-- empty state -->
+      <div id="q-editor-empty" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);text-align:center;padding:40px">
+        <i class="ti ti-calculator" style="font-size:40px;opacity:.3;margin-bottom:12px"></i>
+        <p style="font-size:13px">Select a quote or create a new one</p>
+      </div>
+      <!-- editor -->
+      <div id="q-editor" class="hidden" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+        <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:13px;font-weight:600;color:var(--text)" id="q-editor-title">Quote #—</span>
+            <select class="qstatus-sel" id="q-status-sel" onchange="onQStatusChange()">
+              <option value="Draft">Draft</option>
+              <option value="Sent">Sent</option>
+              <option value="Accepted">Accepted</option>
+              <option value="Declined">Declined</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button class="btn btn-sm" onclick="saveCurrentQuote()"><i class="ti ti-device-floppy"></i>Save</button>
+            <button class="btn btn-sm" onclick="exportCurrentQuotePDF()"><i class="ti ti-file-type-pdf"></i>PDF</button>
+            <button class="btn btn-sm btn-primary" onclick="showTransferBox()"><i class="ti ti-arrow-right"></i>Create order</button>
+          </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:16px 18px">
+
+          <!-- CLIENT -->
+          <div class="card">
+            <div class="sec-title">Client <span class="req">* required</span></div>
+            <div id="q-client-search-wrap">
+              <div class="fg">
+                <label>Search by name</label>
+                <div class="search-wrap">
+                  <input type="text" id="q-client-input" placeholder="Start typing a name…" autocomplete="off" oninput="onQClientSearch()" onfocus="onQClientSearch()" onkeydown="onQClientKey(event)">
+                  <div class="search-dropdown" id="q-client-dropdown" style="display:none"></div>
+                </div>
+              </div>
+            </div>
+            <div id="q-client-card" class="client-selected-card" style="display:none">
+              <div class="avatar" id="q-cc-avatar">—</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:500;color:var(--text)" id="q-cc-name">—</div>
+                <div style="font-size:11px;color:var(--text2)" id="q-cc-details">—</div>
+              </div>
+              <button class="btn btn-xs" onclick="clearQClient()"><i class="ti ti-x"></i>Change</button>
+            </div>
+            <div id="q-new-client-block" class="new-client-block" style="display:none">
+              <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:10px"><i class="ti ti-user-plus" style="font-size:13px;vertical-align:-2px;margin-right:5px"></i>New client</div>
+              <div class="form-row">
+                <div class="fg"><label>Name <span class="req">*</span></label><input type="text" id="qnc-name" placeholder="Full name or company"></div>
+                <div class="fg"><label>Phone <span class="req">*</span></label><input type="text" id="qnc-phone" placeholder="(787) 555-0100"></div>
+              </div>
+              <div class="form-row">
+                <div class="fg"><label>Email <span class="opt">(optional)</span></label><input type="email" id="qnc-email" placeholder="name@example.com"></div>
+                <div class="fg"><label>Address <span class="opt">(optional)</span></label><input type="text" id="qnc-address" placeholder="Street, city, zip"></div>
+              </div>
+              <div class="actions">
+                <button class="btn btn-sm" onclick="cancelQNewClient()">Cancel</button>
+                <button class="btn btn-sm btn-primary" onclick="saveQNewClient()"><i class="ti ti-device-floppy"></i>Save & use</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- JOBS -->
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div class="sec-title" style="margin-bottom:0;border:none;padding:0">Jobs <span class="req">* all fields required</span></div>
+              <button class="btn btn-sm btn-primary" onclick="addQJob()"><i class="ti ti-plus"></i>Add job</button>
+            </div>
+            <div id="q-jobs-container"></div>
+            <div id="q-warn" class="hidden" style="font-size:11px;color:var(--danger);display:flex;align-items:center;gap:5px;margin-bottom:10px">
+              <i class="ti ti-alert-circle"></i> Complete all required fields to generate the quote.
+            </div>
+
+            <!-- Quote output (client view) -->
+            <div id="q-output" class="hidden">
+              <div class="quote-out">
+                <div class="q-hdr">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                    <div>
+                      <div style="font-size:10px;color:rgba(255,255,255,.7);font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px">Quote for</div>
+                      <div style="font-size:16px;font-weight:500;color:#fff" id="q-out-name">—</div>
+                      <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px" id="q-out-details">—</div>
+                    </div>
+                    <div style="text-align:right">
+                      <div style="font-size:10px;color:rgba(255,255,255,.7);font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px">Date</div>
+                      <div style="font-size:12px;color:#fff" id="q-out-date">—</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="q-body">
+                  <div id="q-out-jobs"></div>
+                  <div class="sub-section">
+                    <div class="sub-row"><span>Subtotal</span><span id="q-out-sub">$0.00</span></div>
+                    <div class="sub-row tax"><span>Tax (11.5%)</span><span id="q-out-tax">$0.00</span></div>
+                  </div>
+                  <div class="q-total-row">
+                    <div>
+                      <div style="font-size:11px;color:var(--text2);margin-bottom:2px">Total</div>
+                      <div style="font-size:28px;font-weight:700;color:var(--text)" id="q-out-total">$0.00</div>
+                    </div>
+                    <div class="actions">
+                      <button class="btn btn-sm" onclick="exportCurrentQuotePDF()"><i class="ti ti-file-type-pdf"></i>PDF</button>
+                      <button class="btn btn-sm btn-primary" onclick="showTransferBox()"><i class="ti ti-arrow-right"></i>Create order</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="internal-note">
+                <i class="ti ti-lock" style="font-size:15px;flex-shrink:0;margin-top:1px"></i>
+                <div><strong style="display:block;margin-bottom:4px">Internal only — not shown to client</strong><div id="q-internal" style="line-height:1.9;font-size:11px"></div></div>
+              </div>
+            </div>
+
+            <!-- Transfer box -->
+            <div id="q-transfer-box" class="transfer-box hidden">
+              <h4><i class="ti ti-arrow-right"></i>Transfer to Work orders</h4>
+              <p style="font-size:11px;color:var(--teal-dark);margin-bottom:10px">This will create a new work order with all details pre-filled.</p>
+              <div id="q-transfer-rows"></div>
+              <div class="actions" style="margin-top:12px">
+                <button class="btn btn-sm" onclick="hideTransferBox()">Cancel</button>
+                <button class="btn btn-sm btn-primary" onclick="confirmTransferToOrder()"><i class="ti ti-check"></i>Confirm & create order</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENTS -->
+<div id="view-clients" class="hidden">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn menu-btn" onclick="openMobileMenu()"><i class="ti ti-menu-2"></i></button>
+      <h2>Clients</h2>
+    </div>
+    <button class="btn btn-primary" onclick="openClientForm()"><i class="ti ti-plus"></i>Add client</button>
+  </div>
+  <div class="content">
+    <div class="metric-grid">
+      <div class="metric"><div class="metric-label">Total clients</div><div class="metric-value" id="cl-stat-total">0</div></div>
+      <div class="metric"><div class="metric-label">Active (90d)</div><div class="metric-value" id="cl-stat-active">0</div></div>
+      <div class="metric"><div class="metric-label">Total revenue</div><div class="metric-value" id="cl-stat-rev">$0</div></div>
+      <div class="metric"><div class="metric-label">Avg. order</div><div class="metric-value" id="cl-stat-avg">$0</div></div>
+    </div>
+    <div class="inline-form" id="client-form">
+      <div class="sec-title" id="client-form-title">New client</div>
+      <div class="form-row">
+        <div class="fg"><label>Name</label><input type="text" id="cl-name" placeholder="Full name or company"></div>
+        <div class="fg"><label>Phone</label><input type="text" id="cl-phone" placeholder="(787) 555-0100"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Email <span class="opt">(optional)</span></label><input type="email" id="cl-email" placeholder="name@example.com"></div>
+        <div class="fg"><label>Address <span class="opt">(optional)</span></label><input type="text" id="cl-address" placeholder="Street, city, zip"></div>
+      </div>
+      <div class="fg" style="margin-bottom:10px"><label>Notes <span class="opt">(optional)</span></label><textarea id="cl-notes" placeholder="Preferences, reminders…" style="min-height:44px"></textarea></div>
+      <div class="actions">
+        <button class="btn btn-sm" onclick="closeClientForm()">Cancel</button>
+        <button class="btn btn-sm btn-primary" onclick="saveClient()"><i class="ti ti-device-floppy"></i>Save</button>
+      </div>
+    </div>
+    <div id="cl-list-panel">
+      <div class="search-bar"><i class="ti ti-search"></i><input type="text" placeholder="Search clients…" id="cl-search" oninput="renderClients()"></div>
+      <div id="clients-list"></div>
+      <div id="clients-empty" class="empty hidden"><i class="ti ti-users"></i><p>No clients yet.</p></div>
+    </div>
+    <div id="cl-detail-panel" class="hidden">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap">
+          <div class="avatar" style="width:48px;height:48px;font-size:15px" id="cl-d-avatar">—</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:16px;font-weight:600;color:var(--text)" id="cl-d-name">—</div>
+            <div style="font-size:12px;color:var(--text2)" id="cl-d-sub">—</div>
+          </div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;text-align:right">
+            <div><div class="metric-label">Orders</div><div style="font-size:18px;font-weight:700;color:var(--text)" id="cl-d-count">0</div></div>
+            <div><div class="metric-label">Spent</div><div style="font-size:18px;font-weight:700;color:var(--text)" id="cl-d-spent">$0</div></div>
+            <div><div class="metric-label">Last order</div><div style="font-size:13px;font-weight:500;color:var(--text);margin-top:3px" id="cl-d-last">—</div></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="closeCLDetail()"><i class="ti ti-arrow-left"></i>All clients</button>
+          <button class="btn btn-sm" onclick="editClientFromDetail()"><i class="ti ti-edit"></i>Edit</button>
+          <button class="btn btn-sm btn-primary" onclick="showView('new-order')"><i class="ti ti-plus"></i>New order</button>
+        </div>
+        <div id="cl-d-notes-row" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)"></div>
+      </div>
+      <div class="card">
+        <div class="sec-title">Order history</div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr>
+          <th style="width:78px">Order #</th><th style="width:112px">Job type</th><th style="width:90px">Date</th><th style="width:80px">Total</th><th style="width:92px">Status</th><th style="width:100px">Actions</th>
+        </tr></thead><tbody id="cl-d-orders"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JOB TYPES -->
+<div id="view-jobtypes" class="hidden">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn menu-btn" onclick="openMobileMenu()"><i class="ti ti-menu-2"></i></button>
+      <h2>Job types</h2>
+    </div>
+    <button class="btn btn-primary" onclick="toggleJTForm()"><i class="ti ti-plus"></i>Add job type</button>
+  </div>
+  <div class="content">
+    <div class="inline-form" id="jt-form">
+      <div class="sec-title" id="jt-form-title">New job type</div>
+      <div class="form-row">
+        <div class="fg"><label>Name</label><input type="text" id="jt-name" placeholder="e.g. Canvas prints"></div>
+        <div class="fg"><label>Description <span class="opt">(optional)</span></label><input type="text" id="jt-desc" placeholder="e.g. Large format canvas"></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-sm" onclick="closeJTForm()">Cancel</button>
+        <button class="btn btn-sm btn-primary" onclick="saveJT()"><i class="ti ti-device-floppy"></i>Save</button>
+      </div>
+    </div>
+    <div class="card">
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px">These job types appear across the app. Drag to reorder.</p>
+      <div id="jt-list"></div>
+      <div id="jt-empty" class="empty hidden"><i class="ti ti-layout-list"></i><p>No job types yet.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- MATERIALS -->
+<div id="view-materials" class="hidden">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn menu-btn" onclick="openMobileMenu()"><i class="ti ti-menu-2"></i></button>
+      <h2>Materials</h2>
+    </div>
+    <div class="actions">
+      <button class="btn btn-excel" onclick="triggerImport('materials')"><i class="ti ti-file-upload"></i>Import Excel</button>
+      <button class="btn btn-excel" onclick="exportMatsExcel()"><i class="ti ti-file-download"></i>Export</button>
+      <button class="btn btn-primary" onclick="toggleMatForm()"><i class="ti ti-plus"></i>Add</button>
+    </div>
+  </div>
+  <div class="content">
+    <div id="mat-banner" class="hidden"></div>
+    <div class="inline-form" id="mat-form">
+      <div class="sec-title" id="mat-form-title">New material</div>
+      <div class="form-row three">
+        <div class="fg"><label>Name</label><input type="text" id="m-name" placeholder="e.g. Glossy paper 130g"></div>
+        <div class="fg"><label>Category</label><select id="m-cat"><option>Paper & stock</option><option>Ink & toner</option><option>Vinyl & substrate</option><option>Finishing</option><option>Packaging</option><option>Other</option></select></div>
+        <div class="fg"><label>Unit</label><select id="m-unit"><option>sheet</option><option>sqft</option><option>meter</option><option>kg</option><option>liter</option><option>piece</option><option>roll</option></select></div>
+      </div>
+      <div class="form-row four">
+        <div class="fg"><label>Size <span class="opt">(optional)</span></label><input type="text" id="m-size" placeholder="e.g. 8.5 × 11 in"></div>
+        <div class="fg"><label>Cost per unit ($)</label><input type="number" id="m-cost" placeholder="0.000" step="0.001" min="0"></div>
+        <div class="fg"><label>Stock qty</label><input type="number" id="m-stock" placeholder="0" min="0"></div>
+        <div class="fg"><label>Reorder level</label><input type="number" id="m-reorder" placeholder="0" min="0"></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-sm" onclick="closeMatForm()">Cancel</button>
+        <button class="btn btn-sm btn-primary" onclick="saveMat()"><i class="ti ti-device-floppy"></i>Save</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="search-bar">
+        <i class="ti ti-search"></i>
+        <input type="text" placeholder="Search materials…" id="m-search" oninput="renderMats()">
+        <select id="m-cat-filter" onchange="renderMats()" style="width:148px"><option value="">All categories</option><option>Paper & stock</option><option>Ink & toner</option><option>Vinyl & substrate</option><option>Finishing</option><option>Packaging</option><option>Other</option></select>
+      </div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr>
+        <th style="width:140px">Name</th><th style="width:100px">Category</th><th style="width:54px">Unit</th>
+        <th style="width:90px">Size</th><th style="width:68px">Cost</th><th style="width:56px">Stock</th><th style="width:66px">Status</th><th style="width:86px">Actions</th>
+      </tr></thead><tbody id="mats-body"></tbody></table></div>
+      <div id="mats-empty" class="empty hidden"><i class="ti ti-box"></i><p>No materials yet.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING RULES -->
+<div id="view-pricing" class="hidden">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn menu-btn" onclick="openMobileMenu()"><i class="ti ti-menu-2"></i></button>
+      <h2>Pricing rules</h2>
+    </div>
+    <div class="actions">
+      <button class="btn btn-excel" onclick="triggerImport('pricing')"><i class="ti ti-file-upload"></i>Import Excel</button>
+      <button class="btn btn-excel" onclick="exportPricingExcel()"><i class="ti ti-file-download"></i>Export</button>
+      <button class="btn btn-primary" onclick="togglePForm()"><i class="ti ti-plus"></i>Add rule</button>
+    </div>
+  </div>
+  <div class="content">
+    <div id="pricing-banner" class="hidden"></div>
+    <div class="inline-form" id="p-form">
+      <div class="sec-title">New pricing rule</div>
+      <div class="form-row three">
+        <div class="fg"><label>Rule name</label><input type="text" id="p-name" placeholder="e.g. Business cards 500"></div>
+        <div class="fg"><label>Job type <span class="opt">(any)</span></label><select id="p-jobtype"></select></div>
+        <div class="fg"><label>Base price ($)</label><input type="number" id="p-base" placeholder="0.00" step="0.01" min="0"></div>
+      </div>
+      <div class="form-row three">
+        <div class="fg"><label>Price per unit ($)</label><input type="number" id="p-pu" placeholder="0.000" step="0.001" min="0"></div>
+        <div class="fg"><label>Min quantity</label><input type="number" id="p-min" placeholder="1" min="1"></div>
+        <div class="fg"><label>Markup %</label><input type="number" id="p-mu" placeholder="30" min="0"></div>
+      </div>
+      <div class="fg" style="margin-bottom:10px"><label>Notes <span class="opt">(optional)</span></label><input type="text" id="p-notes" placeholder="Conditions or notes"></div>
+      <div class="actions">
+        <button class="btn btn-sm" onclick="closePForm()">Cancel</button>
+        <button class="btn btn-sm btn-primary" onclick="saveP()"><i class="ti ti-device-floppy"></i>Save rule</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="tbl-wrap"><table class="tbl"><thead><tr>
+        <th style="width:150px">Rule</th><th style="width:110px">Job type</th><th style="width:70px">Base</th><th style="width:70px">Per unit</th><th style="width:60px">Min qty</th><th style="width:60px">Markup</th><th style="width:108px">Actions</th>
+      </tr></thead><tbody id="p-body"></tbody></table></div>
+      <div id="p-empty" class="empty hidden"><i class="ti ti-tag"></i><p>No pricing rules yet.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT PRICING -->
+<div id="view-printpricing" class="hidden">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn menu-btn" onclick="openMobileMenu()"><i class="ti ti-menu-2"></i></button>
+      <h2>Print pricing</h2>
+    </div>
+    <button class="btn btn-primary" onclick="togglePPForm()"><i class="ti ti-plus"></i>Add type</button>
+  </div>
+  <div class="content">
+    <div class="inline-form" id="pp-form">
+      <div class="sec-title" id="pp-form-title">New print type</div>
+      <div class="form-row">
+        <div class="fg"><label>Name</label><input type="text" id="pp-name" placeholder="e.g. Color · Double-sided"></div>
+        <div class="fg"><label>Rate per sheet ($)</label><input type="number" id="pp-rate" placeholder="0.000" step="0.001" min="0"></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-sm" onclick="closePPForm()">Cancel</button>
+        <button class="btn btn-sm btn-primary" onclick="savePP()"><i class="ti ti-device-floppy"></i>Save</button>
+      </div>
+    </div>
+    <div class="card">
+      <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Base rate per sheet. Cost per piece = (material cost + print rate) ÷ size divisor.</p>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr>
+        <th style="width:200px">Print type</th><th style="width:140px">Rate / sheet ($)</th><th style="width:100px">Actions</th>
+      </tr></thead><tbody id="pp-body"></tbody></table></div>
+      <div id="pp-empty" class="empty hidden"><i class="ti ti-printer"></i><p>No print types yet.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- SIZES -->
+<div id="view-sizes" class="hidden">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn menu-btn" onclick="openMobileMenu()"><i class="ti ti-menu-2"></i></button>
+      <h2>Sizes</h2>
+    </div>
+    <button class="btn btn-primary" onclick="toggleSzForm()"><i class="ti ti-plus"></i>Add size</button>
+  </div>
+  <div class="content">
+    <div class="inline-form" id="sz-form">
+      <div class="sec-title" id="sz-form-title">New size</div>
+      <div class="form-row three">
+        <div class="fg"><label>Size label</label><input type="text" id="sz-name" placeholder="e.g. 4 × 6 in"></div>
+        <div class="fg"><label>Divisor (pieces per sheet)</label><input type="number" id="sz-div" placeholder="e.g. 4" min="0.1" step="0.5"></div>
+        <div class="fg"><label>Description <span class="opt">(optional)</span></label><input type="text" id="sz-desc" placeholder="e.g. 4 pieces per sheet"></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-sm" onclick="closeSzForm()">Cancel</button>
+        <button class="btn btn-sm btn-primary" onclick="saveSz()"><i class="ti ti-device-floppy"></i>Save size</button>
+      </div>
+    </div>
+    <div class="card">
+      <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Cost per piece = (material + print rate) ÷ divisor. Higher divisor = more pieces per sheet = lower cost per piece.</p>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr>
+        <th style="width:150px">Size</th><th style="width:100px">Divisor</th><th style="width:200px">Description</th><th style="width:100px">Actions</th>
+      </tr></thead><tbody id="sz-body"></tbody></table></div>
+      <div id="sz-empty" class="empty hidden"><i class="ti ti-ruler"></i><p>No sizes yet.</p></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- IMPORT MODAL -->
+<div id="import-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-hdr"><h3 id="modal-title">Import from Excel</h3><button class="icon-btn" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="confirmImport()"><i class="ti ti-check"></i>Import all</button></div>
+  </div>
+</div>
+
+<div id="install-toast" class="hidden">
+  <strong><i class="ti ti-device-mobile-down" style="font-size:16px;vertical-align:-2px;margin-right:4px"></i>Install Printmaker IAPP</strong>
+  <p style="color:var(--text2);font-size:12px;line-height:1.4">Add to your home screen for quick access and full offline use.</p>
+  <div style="display:flex;gap:8px">
+    <button class="btn" onclick="document.getElementById('install-toast').classList.add('hidden')" style="flex:1">Not now</button>
+    <button class="btn btn-primary" onclick="triggerInstall()" style="flex:2"><i class="ti ti-download"></i>Install</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const TAX=0.115;
+const DB={orders:'pm_orders',mats:'pm_mats',pricing:'pm_pricing',clients:'pm_clients',jobtypes:'pm_jobtypes',printpricing:'pm_printpricing',sizes:'pm_sizes'};
+const DEFAULT_JT=[{id:'jt1',name:'Business cards',desc:''},{id:'jt2',name:'Flyers',desc:''},{id:'jt3',name:'Banners',desc:''},{id:'jt4',name:'Brochures',desc:''},{id:'jt5',name:'Posters',desc:''},{id:'jt6',name:'Stickers',desc:''},{id:'jt7',name:'T-shirt transfer',desc:''},{id:'jt8',name:'Signage',desc:''},{id:'jt9',name:'Custom',desc:''}];
+const DEFAULT_PP=[{id:'pp1',name:'Color · Single-sided',rate:0.08},{id:'pp2',name:'Color · Double-sided',rate:0.14},{id:'pp3',name:'B&W · Single-sided',rate:0.04},{id:'pp4',name:'B&W · Double-sided',rate:0.07}];
+const DEFAULT_SZ=[{id:'sz1',name:'8.5 × 11 in',div:2,desc:'2 pieces per sheet'},{id:'sz2',name:'5.5 × 8.5 in',div:4,desc:'4 pieces per sheet'},{id:'sz3',name:'3.5 × 2 in',div:8,desc:'8 pieces per sheet'},{id:'sz4',name:'4 × 6 in',div:4,desc:'4 pieces per sheet'},{id:'sz5',name:'11 × 17 in',div:1,desc:'1 piece per sheet'},{id:'sz6',name:'Custom',div:1,desc:'Full sheet'}];
+
+let orders=[],materials=[],pricing=[],clients=[],jobtypes=[],printpricing=[],sizes=[];
+let editOId=null,editMId=null,editPId=null,editPPId=null,editSzId=null,editJTId=null,editCLId=null;
+let lineItems=[],pendingImport=null,deferredInstall=null;
+let qJobIdCounter=0,qJobs=[],qSelectedClient=null,qClientFocusIdx=-1,dragSrcJT=null;
+
+function dbGet(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):[]}catch{return[]}}
+function dbSet(k,d){try{localStorage.setItem(k,JSON.stringify(d))}catch(e){console.error(e)}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function fmt(n){return'$'+Number(n).toFixed(2)}
+function fmtK(n){return'$'+Number(n).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+function initials(name){return(name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}
+
+function init(){
+  orders=dbGet(DB.orders);materials=dbGet(DB.mats);pricing=dbGet(DB.pricing);
+  clients=dbGet(DB.clients);jobtypes=dbGet(DB.jobtypes);
+  printpricing=dbGet(DB.printpricing);sizes=dbGet(DB.sizes);
+  if(!jobtypes.length){jobtypes=DEFAULT_JT;dbSet(DB.jobtypes,jobtypes)}
+  if(!printpricing.length){printpricing=DEFAULT_PP;dbSet(DB.printpricing,printpricing)}
+  if(!sizes.length){sizes=DEFAULT_SZ;dbSet(DB.sizes,sizes)}
+  populateAllJTDropdowns();
+  renderOrders();renderMats();renderP();renderPP();renderSz();renderJTs();renderClients();updateStats();updateClientStats();
+}
+
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(e=>console.warn(e))})}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;document.getElementById('install-toast').classList.remove('hidden');document.getElementById('sb-install-area').style.display='block'});
+window.addEventListener('appinstalled',()=>{document.getElementById('install-toast').classList.add('hidden');document.getElementById('sb-install-area').style.display='none';deferredInstall=null});
+function triggerInstall(){if(!deferredInstall)return;deferredInstall.prompt();deferredInstall.userChoice.then(()=>{deferredInstall=null;document.getElementById('install-toast').classList.add('hidden');document.getElementById('sb-install-area').style.display='none'})}
+function openMobileMenu(){document.getElementById('sidebar').classList.add('open');document.getElementById('mobile-overlay').classList.add('show')}
+function closeMobileMenu(){document.getElementById('sidebar').classList.remove('open');document.getElementById('mobile-overlay').classList.remove('show')}
+
+const VIEWS=['orders','new-order','quote','clients','jobtypes','materials','pricing','printpricing','sizes'];
+function showView(v){
+  VIEWS.forEach(id=>{document.getElementById('view-'+id)?.classList.add('hidden');document.getElementById('nav-'+id)?.classList.remove('active')});
+  document.getElementById('view-'+v)?.classList.remove('hidden');
+  document.getElementById('nav-'+v)?.classList.add('active');
+  if(v==='new-order'&&!editOId)resetOForm();
+  if(v==='orders'){renderOrders();updateStats()}
+  if(v==='materials')renderMats();
+  if(v==='pricing')renderP();
+  if(v==='printpricing')renderPP();
+  if(v==='sizes')renderSz();
+  if(v==='jobtypes')renderJTs();
+  if(v==='clients'){renderClients();closeCLDetail()}
+  if(v==='quote'){populateQJobDropdowns()}
+  window.scrollTo?.(0,0);
+}
+
+function populateAllJTDropdowns(){
+  ['f-jobtype','p-jobtype'].forEach(id=>{
+    const sel=document.getElementById(id);if(!sel)return;
+    const prev=sel.value;
+    sel.innerHTML=jobtypes.map(jt=>`<option value="${jt.name}">${jt.name}</option>`).join('');
+    if(prev)sel.value=prev;
+  });
+}
+function populateQJobDropdowns(){
+  qJobs.forEach(job=>{
+    const sel=document.getElementById('qjt-'+job.id);
+    if(!sel)return;const prev=sel.value;
+    sel.innerHTML='<option value="">— select —</option>'+jobtypes.map(jt=>`<option value="${jt.name}">${jt.name}</option>`).join('');
+    if(prev)sel.value=prev;
+  });
+}
+
+// ── STATS ──
+function updateStats(){
+  document.getElementById('stat-total').textContent=orders.length;
+  document.getElementById('stat-prog').textContent=orders.filter(o=>o.status==='In Progress').length;
+  document.getElementById('stat-done').textContent=orders.filter(o=>o.status==='Completed').length;
+  const rev=orders.filter(o=>o.status==='Completed').reduce((s,o)=>s+(+o.total),0);
+  document.getElementById('stat-rev').textContent=fmtK(rev);
+}
+function updateClientStats(){
+  document.getElementById('cl-stat-total').textContent=clients.length;
+  const ninety=Date.now()-90*24*60*60*1000;
+  const activeIds=new Set(orders.filter(o=>o.created>ninety).map(o=>o.clientId));
+  document.getElementById('cl-stat-active').textContent=activeIds.size;
+  const allRev=orders.filter(o=>o.status==='Completed').reduce((s,o)=>s+(+o.total),0);
+  document.getElementById('cl-stat-rev').textContent=fmtK(allRev);
+  const cnt=orders.filter(o=>o.status==='Completed').length;
+  document.getElementById('cl-stat-avg').textContent=cnt?fmtK(allRev/cnt):'$0';
+}
+function sBadge(s){const m={'Pending':'badge-amber','In Progress':'badge-blue','Completed':'badge-green','Cancelled':'badge-red'};return`<span class="badge ${m[s]||'badge-amber'}">${s}</span>`}
+
+// ── ORDERS ──
+function renderOrders(){
+  const q=document.getElementById('o-search').value.toLowerCase();
+  const f=document.getElementById('o-filter').value;
+  let list=orders.filter(o=>(!q||o.client.toLowerCase().includes(q)||o.jobtype.toLowerCase().includes(q)||o.id.includes(q))&&(!f||o.status===f)).sort((a,b)=>b.created-a.created);
+  const body=document.getElementById('orders-body');const empty=document.getElementById('orders-empty');
+  if(!list.length){body.innerHTML='';empty.classList.remove('hidden');return}
+  empty.classList.add('hidden');
+  body.innerHTML=list.map(o=>`<tr>
+    <td><span class="wo-id">#${o.id.toUpperCase().slice(-6)}</span></td>
+    <td style="font-weight:500">${o.client}</td><td>${o.jobtype}</td><td>${o.duedate||'—'}</td>
+    <td style="font-weight:600">${fmt(o.total)}</td><td>${sBadge(o.status)}</td>
+    <td><div class="actions">
+      <button class="icon-btn" onclick="editO('${o.id}')"><i class="ti ti-edit"></i></button>
+      <button class="icon-btn" onclick="pdfOrder('${o.id}')"><i class="ti ti-file-type-pdf"></i></button>
+      <button class="icon-btn danger" onclick="delO('${o.id}')"><i class="ti ti-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+function resetOForm(){
+  editOId=null;document.getElementById('o-form-title').textContent='New work order';
+  ['f-client','f-contact','f-notes'].forEach(id=>document.getElementById(id).value='');
+  const sel=document.getElementById('f-jobtype');if(sel.options.length)sel.selectedIndex=0;
+  document.getElementById('f-status').value='Pending';document.getElementById('f-duedate').value='';
+  lineItems=[{id:uid(),desc:'',qty:1,price:0}];renderLIs();
+}
+function editO(id){
+  const o=orders.find(x=>x.id===id);if(!o)return;
+  editOId=id;document.getElementById('o-form-title').textContent='Edit work order';
+  document.getElementById('f-client').value=o.client;document.getElementById('f-contact').value=o.contact||'';
+  document.getElementById('f-jobtype').value=o.jobtype;document.getElementById('f-status').value=o.status;
+  document.getElementById('f-duedate').value=o.duedate||'';document.getElementById('f-notes').value=o.notes||'';
+  lineItems=o.lineItems?JSON.parse(JSON.stringify(o.lineItems)):[{id:uid(),desc:'',qty:1,price:0}];
+  renderLIs();showView('new-order');
+}
+function delO(id){if(!confirm('Delete this work order?'))return;orders=orders.filter(o=>o.id!==id);dbSet(DB.orders,orders);renderOrders();updateStats()}
+function addLI(){lineItems.push({id:uid(),desc:'',qty:1,price:0});renderLIs()}
+function removeLI(id){lineItems=lineItems.filter(i=>i.id!==id);renderLIs()}
+function renderLIs(){
+  document.getElementById('li-container').innerHTML=lineItems.map(item=>`
+    <div class="li-row" id="li-${item.id}">
+      <input type="text" value="${item.desc.replace(/"/g,'&quot;')}" placeholder="Description" oninput="updLI('${item.id}','desc',this.value)">
+      <input type="number" value="${item.qty}" min="1" step="1" oninput="updLI('${item.id}','qty',+this.value)">
+      <input type="number" value="${item.price}" min="0" step="0.01" oninput="updLI('${item.id}','price',+this.value)">
+      <input type="text" value="${fmt(item.qty*item.price)}" readonly style="color:var(--text2)">
+      <button class="icon-btn danger" onclick="removeLI('${item.id}')"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+  updTotals();
+}
+function updLI(id,field,val){
+  const item=lineItems.find(i=>i.id===id);
+  if(item){item[field]=val;const row=document.getElementById('li-'+id);if(row){const ins=row.querySelectorAll('input');ins[3].value=fmt((+ins[1].value)*(+ins[2].value));}updTotals()}
+}
+function calcSub(){return lineItems.reduce((s,i)=>s+(+i.qty*(+i.price)),0)}
+function updTotals(){
+  const sub=calcSub();const tax=sub*TAX;
+  document.getElementById('f-sub').textContent=fmt(sub);
+  document.getElementById('f-tax').textContent=fmt(tax);
+  document.getElementById('f-total').textContent=fmt(sub+tax);
+}
+function saveOrder(){
+  const client=document.getElementById('f-client').value.trim();if(!client){alert('Enter a client name.');return}
+  const sub=calcSub();const total=sub+sub*TAX;
+  const o={id:editOId||uid(),client,contact:document.getElementById('f-contact').value.trim(),jobtype:document.getElementById('f-jobtype').value,status:document.getElementById('f-status').value,duedate:document.getElementById('f-duedate').value,notes:document.getElementById('f-notes').value.trim(),lineItems:JSON.parse(JSON.stringify(lineItems)),subtotal:sub,total,created:editOId?(orders.find(x=>x.id===editOId)||{}).created||Date.now():Date.now()};
+  orders=editOId?orders.map(x=>x.id===editOId?o:x):[o,...orders];
+  dbSet(DB.orders,orders);editOId=null;showView('orders');
+}
+
+// ── CLIENTS ──
+function renderClients(){
+  const q=document.getElementById('cl-search').value.toLowerCase();
+  const list=clients.filter(c=>!q||c.name.toLowerCase().includes(q)||(c.phone||'').includes(q)).sort((a,b)=>a.name.localeCompare(b.name));
+  const container=document.getElementById('clients-list');const empty=document.getElementById('clients-empty');
+  if(!list.length){container.innerHTML='';empty.classList.remove('hidden');return}
+  empty.classList.add('hidden');
+  container.innerHTML=list.map(c=>{
+    const clientOrders=orders.filter(o=>o.clientId===c.id);
+    const total=clientOrders.reduce((s,o)=>s+(+o.total),0);
+    return`<div class="client-card-row" onclick="openCLDetail('${c.id}')">
+      <div class="avatar">${initials(c.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;color:var(--text)">${c.name}</div>
+        <div style="font-size:11px;color:var(--text2)">${[c.phone,c.email].filter(Boolean).join(' · ')||'No contact info'}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:13px;font-weight:600">${fmtK(total)}</div>
+        <div style="font-size:10px;color:var(--text3)">${clientOrders.length} order${clientOrders.length!==1?'s':''}</div>
+      </div>
+      <i class="ti ti-chevron-right" style="color:var(--text3);font-size:15px"></i>
+    </div>`;
+  }).join('');
+  updateClientStats();
+}
+function openClientForm(id){
+  editCLId=id||null;
+  document.getElementById('client-form-title').textContent=id?'Edit client':'New client';
+  if(id){const c=clients.find(x=>x.id===id);document.getElementById('cl-name').value=c.name;document.getElementById('cl-phone').value=c.phone||'';document.getElementById('cl-email').value=c.email||'';document.getElementById('cl-address').value=c.address||'';document.getElementById('cl-notes').value=c.notes||'';}
+  else{['cl-name','cl-phone','cl-email','cl-address','cl-notes'].forEach(id=>document.getElementById(id).value='')}
+  document.getElementById('client-form').classList.add('open');
+  document.getElementById('cl-name').focus();
+}
+function closeClientForm(){document.getElementById('client-form').classList.remove('open');editCLId=null}
+function saveClient(){
+  const name=document.getElementById('cl-name').value.trim();if(!name){alert('Enter a name.');return}
+  const c={id:editCLId||uid(),name,phone:document.getElementById('cl-phone').value.trim(),email:document.getElementById('cl-email').value.trim(),address:document.getElementById('cl-address').value.trim(),notes:document.getElementById('cl-notes').value.trim()};
+  clients=editCLId?clients.map(x=>x.id===editCLId?c:x):[c,...clients];
+  dbSet(DB.clients,clients);editCLId=null;closeClientForm();renderClients();
+}
+function openCLDetail(id){
+  const c=clients.find(x=>x.id===id);if(!c)return;
+  const clientOrders=orders.filter(o=>o.clientId===id).sort((a,b)=>b.created-a.created);
+  const total=clientOrders.reduce((s,o)=>s+(+o.total),0);
+  document.getElementById('cl-d-avatar').textContent=initials(c.name);
+  document.getElementById('cl-d-name').textContent=c.name;
+  document.getElementById('cl-d-sub').textContent=[c.phone,c.email,c.address].filter(Boolean).join(' · ')||'No contact info';
+  document.getElementById('cl-d-count').textContent=clientOrders.length;
+  document.getElementById('cl-d-spent').textContent=fmtK(total);
+  document.getElementById('cl-d-last').textContent=clientOrders[0]?new Date(clientOrders[0].created).toLocaleDateString():'—';
+  const notesRow=document.getElementById('cl-d-notes-row');
+  if(c.notes){notesRow.style.display='block';notesRow.textContent=c.notes}else notesRow.style.display='none';
+  document.getElementById('cl-d-orders').innerHTML=clientOrders.length?clientOrders.map(o=>`<tr>
+    <td><span class="wo-id">#${o.id.toUpperCase().slice(-6)}</span></td><td>${o.jobtype}</td>
+    <td>${new Date(o.created).toLocaleDateString()}</td><td style="font-weight:600">${fmt(o.total)}</td><td>${sBadge(o.status)}</td>
+    <td><div class="actions">
+      <button class="icon-btn" onclick="editO('${o.id}')"><i class="ti ti-edit"></i></button>
+      <button class="icon-btn" onclick="pdfOrder('${o.id}')"><i class="ti ti-file-type-pdf"></i></button>
+    </div></td>
+  </tr>`).join(''):`<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">No orders yet</td></tr>`;
+  document.getElementById('cl-detail-panel').dataset.clientId=id;
+  document.getElementById('cl-list-panel').classList.add('hidden');
+  document.getElementById('cl-detail-panel').classList.remove('hidden');
+}
+function closeCLDetail(){
+  document.getElementById('cl-detail-panel').classList.add('hidden');
+  document.getElementById('cl-list-panel').classList.remove('hidden');
+}
+function editClientFromDetail(){
+  const id=document.getElementById('cl-detail-panel').dataset.clientId;
+  closeCLDetail();openClientForm(id);
+}
+
+// ── JOB TYPES ──
+function renderJTs(){
+  const list=document.getElementById('jt-list');const empty=document.getElementById('jt-empty');
+  if(!jobtypes.length){list.innerHTML='';empty.classList.remove('hidden');return}
+  empty.classList.add('hidden');
+  list.innerHTML=jobtypes.map((jt,i)=>`
+    <div class="jt-item" draggable="true" id="jti-${jt.id}" ondragstart="jtDragStart(event,'${jt.id}')" ondragover="jtDragOver(event)" ondrop="jtDrop(event,'${jt.id}')" ondragend="jtDragEnd(event)">
+      <i class="ti ti-grip-vertical jt-drag"></i>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;color:var(--text)">${jt.name}</div>
+        ${jt.desc?`<div style="font-size:11px;color:var(--text3)">${jt.desc}</div>`:''}
+      </div>
+      <div class="actions">
+        <button class="icon-btn" onclick="openJTForm('${jt.id}')"><i class="ti ti-edit"></i></button>
+        <button class="icon-btn danger" onclick="delJT('${jt.id}')"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+function toggleJTForm(){document.getElementById('jt-form').classList.toggle('open')}
+function openJTForm(id){editJTId=id||null;const jt=jobtypes.find(x=>x.id===id);document.getElementById('jt-form-title').textContent=id?'Edit job type':'New job type';document.getElementById('jt-name').value=jt?jt.name:'';document.getElementById('jt-desc').value=jt?jt.desc||'':'';document.getElementById('jt-form').classList.add('open');document.getElementById('jt-name').focus()}
+function closeJTForm(){document.getElementById('jt-form').classList.remove('open');editJTId=null}
+function saveJT(){
+  const name=document.getElementById('jt-name').value.trim();if(!name){alert('Enter a name.');return}
+  if(!editJTId&&jobtypes.find(j=>j.name.toLowerCase()===name.toLowerCase())){alert('Job type already exists.');return}
+  const jt={id:editJTId||uid(),name,desc:document.getElementById('jt-desc').value.trim()};
+  jobtypes=editJTId?jobtypes.map(x=>x.id===editJTId?jt:x):[...jobtypes,jt];
+  dbSet(DB.jobtypes,jobtypes);editJTId=null;closeJTForm();renderJTs();populateAllJTDropdowns();populateQJobDropdowns();
+}
+function delJT(id){
+  const jt=jobtypes.find(x=>x.id===id);
+  if(!confirm(`Delete job type "${jt.name}"?`))return;
+  jobtypes=jobtypes.filter(x=>x.id!==id);dbSet(DB.jobtypes,jobtypes);renderJTs();populateAllJTDropdowns();populateQJobDropdowns();
+}
+function jtDragStart(e,id){dragSrcJT=id;e.currentTarget.style.opacity='.4'}
+function jtDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move'}
+function jtDrop(e,targetId){
+  e.stopPropagation();if(dragSrcJT===targetId)return;
+  const from=jobtypes.findIndex(j=>j.id===dragSrcJT);const to=jobtypes.findIndex(j=>j.id===targetId);
+  const moved=jobtypes.splice(from,1)[0];jobtypes.splice(to,0,moved);
+  dbSet(DB.jobtypes,jobtypes);renderJTs();populateAllJTDropdowns();populateQJobDropdowns();
+}
+function jtDragEnd(e){e.currentTarget.style.opacity='1'}
+
+// ── MATERIALS ──
+function renderMats(){
+  const q=document.getElementById('m-search').value.toLowerCase();const cat=document.getElementById('m-cat-filter').value;
+  const list=materials.filter(m=>(!q||m.name.toLowerCase().includes(q))&&(!cat||m.category===cat));
+  const body=document.getElementById('mats-body');const empty=document.getElementById('mats-empty');
+  if(!list.length){body.innerHTML='';empty.classList.remove('hidden');return}
+  empty.classList.add('hidden');
+  body.innerHTML=list.map(m=>`<tr>
+    <td style="font-weight:500">${m.name}</td><td>${m.category}</td><td>${m.unit}</td>
+    <td style="color:var(--text2)">${m.size||'—'}</td>
+    <td>$${Number(m.cost).toFixed(3)}</td><td>${m.stock}</td>
+    <td>${+m.stock<=+m.reorder?'<span class="badge badge-red">Reorder</span>':'<span class="badge badge-teal">OK</span>'}</td>
+    <td><div class="actions">
+      <button class="icon-btn" onclick="openMatForm('${m.id}')"><i class="ti ti-edit"></i></button>
+      <button class="icon-btn danger" onclick="delMat('${m.id}')"><i class="ti ti-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+function toggleMatForm(){document.getElementById('mat-form').classList.toggle('open')}
+function openMatForm(id){
+  editMId=id||null;document.getElementById('mat-form-title').textContent=id?'Edit material':'New material';
+  if(id){const m=materials.find(x=>x.id===id);document.getElementById('m-name').value=m.name;document.getElementById('m-cat').value=m.category;document.getElementById('m-unit').value=m.unit;document.getElementById('m-size').value=m.size||'';document.getElementById('m-cost').value=m.cost;document.getElementById('m-stock').value=m.stock;document.getElementById('m-reorder').value=m.reorder;}
+  else{['m-name','m-size','m-cost','m-stock','m-reorder'].forEach(id=>document.getElementById(id).value='')}
+  document.getElementById('mat-form').classList.add('open');document.getElementById('m-name').focus();
+}
+function closeMatForm(){document.getElementById('mat-form').classList.remove('open');editMId=null}
+function saveMat(){
+  const name=document.getElementById('m-name').value.trim();if(!name){alert('Enter a name.');return}
+  const m={id:editMId||uid(),name,category:document.getElementById('m-cat').value,unit:document.getElementById('m-unit').value,size:document.getElementById('m-size').value.trim(),cost:+document.getElementById('m-cost').value||0,stock:+document.getElementById('m-stock').value||0,reorder:+document.getElementById('m-reorder').value||0};
+  materials=editMId?materials.map(x=>x.id===editMId?m:x):[m,...materials];
+  dbSet(DB.mats,materials);editMId=null;closeMatForm();renderMats();
+}
+function delMat(id){if(!confirm('Delete this material?'))return;materials=materials.filter(m=>m.id!==id);dbSet(DB.mats,materials);renderMats()}
+
+// ── PRICING ──
+function renderP(){
+  const body=document.getElementById('p-body');const empty=document.getElementById('p-empty');
+  if(!pricing.length){body.innerHTML='';empty.classList.remove('hidden');return}
+  empty.classList.add('hidden');
+  body.innerHTML=pricing.map(p=>`<tr>
+    <td style="font-weight:500">${p.name}</td><td>${p.jobtype||'Any'}</td>
+    <td>${fmt(p.base)}</td><td>$${Number(p.perunit).toFixed(3)}</td><td>${p.minqty||1}</td><td>${p.markup||0}%</td>
+    <td><div class="actions">
+      <button class="icon-btn" onclick="openPForm('${p.id}')"><i class="ti ti-edit"></i></button>
+      <button class="icon-btn danger" onclick="delP('${p.id}')"><i class="ti ti-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+function togglePForm(){document.getElementById('p-form').classList.toggle('open')}
+function openPForm(id){
+  editPId=id||null;
+  if(id){const p=pricing.find(x=>x.id===id);document.getElementById('p-name').value=p.name;document.getElementById('p-jobtype').value=p.jobtype||'';document.getElementById('p-base').value=p.base;document.getElementById('p-pu').value=p.perunit;document.getElementById('p-min').value=p.minqty||1;document.getElementById('p-mu').value=p.markup||0;document.getElementById('p-notes').value=p.notes||'';}
+  else{['p-name','p-base','p-pu','p-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('p-min').value=1;document.getElementById('p-mu').value=30}
+  document.getElementById('p-form').classList.add('open');document.getElementById('p-name').focus();
+}
+function closePForm(){document.getElementById('p-form').classList.remove('open');editPId=null}
+function saveP(){
+  const name=document.getElementById('p-name').value.trim();if(!name){alert('Enter a rule name.');return}
+  const p={id:editPId||uid(),name,jobtype:document.getElementById('p-jobtype').value,base:+document.getElementById('p-base').value||0,perunit:+document.getElementById('p-pu').value||0,minqty:+document.getElementById('p-min').value||1,markup:+document.getElementById('p-mu').value||0,notes:document.getElementById('p-notes').value.trim()};
+  pricing=editPId?pricing.map(x=>x.id===editPId?p:x):[p,...pricing];
+  dbSet(DB.pricing,pricing);editPId=null;closePForm();renderP();
+}
+function delP(id){if(!confirm('Delete?'))return;pricing=pricing.filter(p=>p.id!==id);dbSet(DB.pricing,pricing);renderP()}
+
+// ── PRINT PRICING ──
+function renderPP(){
+  const body=document.getElementById('pp-body');const empty=document.getElementById('pp-empty');
+  if(!printpricing.length){body.innerHTML='';empty.classList.remove('hidden');return}
+  empty.classList.add('hidden');
+  body.innerHTML=printpricing.map(p=>`<tr>
+    <td style="font-weight:500">${p.name}</td>
+    <td>$${Number(p.rate).toFixed(3)}</td>
+    <td><div class="actions">
+      <button class="icon-btn" onclick="openPPForm('${p.id}')"><i class="ti ti-edit"></i></button>
+      <button class="icon-btn danger" onclick="delPP('${p.id}')"><i class="ti ti-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+function togglePPForm(){document.getElementById('pp-form').classList.toggle('open')}
+function openPPForm(id){
+  editPPId=id||null;const pp=printpricing.find(x=>x.id===id);
+  document.getElementById('pp-form-title').textContent=id?'Edit print type':'New print type';
+  document.getElementById('pp-name').value=pp?pp.name:'';document.getElementById('pp-rate').value=pp?pp.rate:'';
+  document.getElementById('pp-form').classList.add('open');document.getElementById('pp-name').focus();
+}
+function closePPForm(){document.getElementById('pp-form').classList.remove('open');editPPId=null}
+function savePP(){
+  const name=document.getElementById('pp-name').value.trim();if(!name){alert('Enter a name.');return}
+  const pp={id:editPPId||uid(),name,rate:+document.getElementById('pp-rate').value||0};
+  printpricing=editPPId?printpricing.map(x=>x.id===editPPId?pp:x):[pp,...printpricing];
+  dbSet(DB.printpricing,printpricing);editPPId=null;closePPForm();renderPP();
+}
+function delPP(id){if(!confirm('Delete?'))return;printpricing=printpricing.filter(p=>p.id!==id);dbSet(DB.printpricing,printpricing);renderPP()}
+
+// ── SIZES ──
+function renderSz(){
+  const body=document.getElementById('sz-body');const empty=document.getElementById('sz-empty');
+  if(!sizes.length){body.innerHTML='';empty.classList.remove('hidden');return}
+  empty.classList.add('hidden');
+  body.innerHTML=sizes.map(s=>`<tr>
+    <td style="font-weight:500">${s.name}</td>
+    <td style="font-family:var(--mono)">÷${s.div}</td>
+    <td style="color:var(--text2)">${s.desc||'—'}</td>
+    <td><div class="actions">
+      <button class="icon-btn" onclick="openSzForm('${s.id}')"><i class="ti ti-edit"></i></button>
+      <button class="icon-btn danger" onclick="delSz('${s.id}')"><i class="ti ti-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+function toggleSzForm(){document.getElementById('sz-form').classList.toggle('open')}
+function openSzForm(id){
+  editSzId=id||null;const sz=sizes.find(x=>x.id===id);
+  document.getElementById('sz-form-title').textContent=id?'Edit size':'New size';
+  document.getElementById('sz-name').value=sz?sz.name:'';document.getElementById('sz-div').value=sz?sz.div:'';document.getElementById('sz-desc').value=sz?sz.desc||'':'';
+  document.getElementById('sz-form').classList.add('open');document.getElementById('sz-name').focus();
+}
+function closeSzForm(){document.getElementById('sz-form').classList.remove('open');editSzId=null}
+function saveSz(){
+  const name=document.getElementById('sz-name').value.trim();if(!name){alert('Enter a size label.');return}
+  const sz={id:editSzId||uid(),name,div:parseFloat(document.getElementById('sz-div').value)||1,desc:document.getElementById('sz-desc').value.trim()};
+  sizes=editSzId?sizes.map(x=>x.id===editSzId?sz:x):[...sizes,sz];
+  dbSet(DB.sizes,sizes);editSzId=null;closeSzForm();renderSz();
+}
+function delSz(id){if(!confirm('Delete?'))return;sizes=sizes.filter(s=>s.id!==id);dbSet(DB.sizes,sizes);renderSz()}
+
+// ── QUOTE BUILDER ──
+function onQClientSearch(){
+  const q=document.getElementById('q-client-input').value.trim().toLowerCase();
+  const dd=document.getElementById('q-client-dropdown');qClientFocusIdx=-1;
+  const matches=q?clients.filter(c=>c.name.toLowerCase().includes(q)||(c.phone||'').includes(q)):clients;
+  dd.innerHTML=[...matches.map(c=>`
+    <div class="sd-item" onclick="selectQClient('${c.id}')">
+      <div class="sd-av">${initials(c.name)}</div>
+      <div><div style="font-weight:500;font-size:12px;color:var(--text)">${c.name}</div><div style="font-size:10px;color:var(--text2)">${c.phone||''}${c.email?' · '+c.email:''}</div></div>
+    </div>`),
+    `<div class="sd-item" onclick="showQNewClient()">
+      <div class="sd-av new-av"><i class="ti ti-plus" style="font-size:12px"></i></div>
+      <div><div style="font-weight:500;font-size:12px;color:var(--text)">New client…</div><div style="font-size:10px;color:var(--text2)">Add to client list</div></div>
+    </div>`
+  ].join('');
+  dd.style.display='block';
+}
+function onQClientKey(e){
+  const items=document.getElementById('q-client-dropdown').querySelectorAll('.sd-item');if(!items.length)return;
+  if(e.key==='ArrowDown'){e.preventDefault();qClientFocusIdx=Math.min(qClientFocusIdx+1,items.length-1);items.forEach((el,i)=>el.classList.toggle('focused',i===qClientFocusIdx))}
+  else if(e.key==='ArrowUp'){e.preventDefault();qClientFocusIdx=Math.max(qClientFocusIdx-1,0);items.forEach((el,i)=>el.classList.toggle('focused',i===qClientFocusIdx))}
+  else if(e.key==='Enter'&&qClientFocusIdx>=0)items[qClientFocusIdx].click();
+  else if(e.key==='Escape')document.getElementById('q-client-dropdown').style.display='none';
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))document.getElementById('q-client-dropdown').style.display='none'});
+function selectQClient(id){
+  const c=clients.find(x=>x.id===id);if(!c)return;
+  qSelectedClient=c;
+  document.getElementById('q-client-input').value=c.name;
+  document.getElementById('q-client-dropdown').style.display='none';
+  document.getElementById('q-cc-avatar').textContent=initials(c.name);
+  document.getElementById('q-cc-name').textContent=c.name;
+  document.getElementById('q-cc-details').textContent=[c.phone,c.email,c.address].filter(Boolean).join(' · ');
+  document.getElementById('q-client-card').style.display='flex';
+  document.getElementById('q-client-search-wrap').style.display='none';
+  calcQ();
+}
+function clearQClient(){
+  qSelectedClient=null;document.getElementById('q-client-input').value='';
+  document.getElementById('q-client-card').style.display='none';
+  document.getElementById('q-client-search-wrap').style.display='block';
+  document.getElementById('q-new-client-block').style.display='none';
+  calcQ();
+}
+function showQNewClient(){document.getElementById('q-client-dropdown').style.display='none';document.getElementById('q-new-client-block').style.display='block'}
+function cancelQNewClient(){document.getElementById('q-new-client-block').style.display='none';document.getElementById('q-client-input').value=''}
+function saveQNewClient(){
+  const name=document.getElementById('qnc-name').value.trim();const phone=document.getElementById('qnc-phone').value.trim();
+  if(!name||!phone){alert('Name and phone are required.');return}
+  const c={id:uid(),name,phone,email:document.getElementById('qnc-email').value.trim(),address:document.getElementById('qnc-address').value.trim()};
+  clients=[c,...clients];dbSet(DB.clients,clients);
+  qSelectedClient=c;
+  document.getElementById('q-cc-avatar').textContent=initials(c.name);
+  document.getElementById('q-cc-name').textContent=c.name;
+  document.getElementById('q-cc-details').textContent=[phone,c.email,c.address].filter(Boolean).join(' · ');
+  document.getElementById('q-client-card').style.display='flex';
+  document.getElementById('q-client-search-wrap').style.display='none';
+  document.getElementById('q-new-client-block').style.display='none';
+  renderClients();calcQ();
+}
+
+function qSzOpts(){return'<option value="">— select —</option>'+sizes.map(s=>`<option value="${s.id}">${s.name} (÷${s.div})</option>`).join('')}
+function qRuleOpts(){return'<option value="">— select —</option>'+pricing.map(r=>`<option value="${r.id}">${r.name}</option>`).join('')}
+function qMatOpts(){return'<option value="">— select —</option>'+materials.map(m=>`<option value="${m.id}">${m.name}${m.size?' ('+m.size+')':''}</option>`).join('')}
+function qPPOpts(){return'<option value="">— select —</option>'+printpricing.map(p=>`<option value="${p.id}">${p.name} — $${p.rate.toFixed(3)}/sheet</option>`).join('')}
+function qJTOpts(){return'<option value="">— select —</option>'+jobtypes.map(jt=>`<option value="${jt.name}">${jt.name}</option>`).join('')}
+
+function addQJob(){
+  const id='qj'+(++qJobIdCounter);
+  qJobs.push({id});
+  const el=document.createElement('div');el.className='job-block';el.id='qjob-'+id;
+  el.innerHTML=`
+    <div class="job-hdr">
+      <span style="font-size:12px;font-weight:500;color:var(--text)" id="qjnum-${id}">Job 1</span>
+      <button class="btn btn-xs btn-danger" onclick="removeQJob('${id}')"><i class="ti ti-trash"></i>Remove</button>
+    </div>
+    <div class="form-row four">
+      <div class="fg"><label>Job type <span class="req">*</span></label><select id="qjt-${id}" class="err" onchange="calcQ()">${qJTOpts()}</select></div>
+      <div class="fg"><label>Quantity <span class="req">*</span></label><input type="number" id="qqty-${id}" placeholder="e.g. 500" min="1" class="err" oninput="calcQ()"></div>
+      <div class="fg"><label>Material <span class="req">*</span></label><select id="qmat-${id}" class="err" onchange="calcQ()">${qMatOpts()}</select></div>
+      <div class="fg"><label>Size <span class="req">*</span></label><select id="qsz-${id}" class="err" onchange="calcQ()">${qSzOpts()}</select></div>
+    </div>
+    <div class="form-row" style="margin-top:8px">
+      <div class="fg"><label>Print type <span class="req">*</span></label><select id="qpp-${id}" class="err" onchange="calcQ()">${qPPOpts()}</select></div>
+      <div class="fg"><label>Pricing rule <span class="req">*</span></label><select id="qrule-${id}" class="err" onchange="calcQ()">${qRuleOpts()}</select></div>
+    </div>
+    <div class="fg" style="margin-top:8px"><label>Notes <span class="opt">(optional)</span></label><textarea id="qnotes-${id}" rows="2" placeholder="e.g. Matte finish, bleed 0.125 in…" oninput="calcQ()"></textarea></div>
+    <div class="formula-box" id="qformula-${id}">Complete all fields above to see pricing.</div>`;
+  document.getElementById('q-jobs-container').appendChild(el);
+  renumberQJobs();calcQ();
+}
+function removeQJob(id){qJobs=qJobs.filter(j=>j.id!==id);document.getElementById('qjob-'+id)?.remove();renumberQJobs();calcQ()}
+function renumberQJobs(){document.querySelectorAll('.job-block').forEach((el,i)=>{const id=el.id.replace('qjob-','');const n=document.getElementById('qjnum-'+id);if(n)n.textContent='Job '+(i+1)})}
+
+function calcQ(){
+  const warn=document.getElementById('q-warn');const out=document.getElementById('q-output');
+  if(!qJobs.length){warn.classList.add('hidden');out.classList.add('hidden');return}
+  let allValid=!!qSelectedClient;let grandPre=0;
+  const jobOuts=[],intLines=[];
+  qJobs.forEach(job=>{
+    const jtEl=document.getElementById('qjt-'+job.id);if(!jtEl)return;
+    const qtyEl=document.getElementById('qqty-'+job.id);
+    const matEl=document.getElementById('qmat-'+job.id);
+    const szEl=document.getElementById('qsz-'+job.id);
+    const ppEl=document.getElementById('qpp-'+job.id);
+    const ruleEl=document.getElementById('qrule-'+job.id);
+    const notesEl=document.getElementById('qnotes-'+job.id);
+    const jt=jtEl.value,qty=parseInt(qtyEl.value)||0,matId=matEl.value,szId=szEl.value,ppId=ppEl.value,ruleId=ruleEl.value;
+    const valid=jt&&qty>0&&matId&&szId&&ppId&&ruleId;
+    jtEl.classList.toggle('err',!jt);qtyEl.classList.toggle('err',qty<=0);matEl.classList.toggle('err',!matId);
+    szEl.classList.toggle('err',!szId);ppEl.classList.toggle('err',!ppId);ruleEl.classList.toggle('err',!ruleId);
+    if(!valid){allValid=false;document.getElementById('qformula-'+job.id).textContent='Complete all fields above to see pricing.';return}
+    const mat=materials.find(m=>m.id===matId);
+    const sz=sizes.find(s=>s.id===szId);
+    const pp=printpricing.find(p=>p.id===ppId);
+    const rule=pricing.find(r=>r.id===ruleId);
+    const costPerPiece=(mat.cost+pp.rate)/sz.div;
+    const lineCost=costPerPiece*qty;
+    const ruleBase=rule.base+(rule.perunit*qty);
+    const preTax=(lineCost+ruleBase)*(1+rule.markup/100);
+    grandPre+=preTax;
+    const notes=notesEl?notesEl.value.trim():'';
+    document.getElementById('qformula-'+job.id).textContent=`($${mat.cost.toFixed(3)} mat + $${pp.rate.toFixed(3)} print) ÷ ${sz.div} (${sz.name}) = $${costPerPiece.toFixed(4)}/pc × ${qty} = $${lineCost.toFixed(2)} + rule $${ruleBase.toFixed(2)} + ${rule.markup}% = $${preTax.toFixed(2)}`;
+    jobOuts.push({jt,qty,mat:mat.name,sz:sz.name,pp:pp.name,notes,preTax});
+    intLines.push(`<div><strong>Job ${jobOuts.length}: ${jt}</strong> — ($${mat.cost.toFixed(3)}+$${pp.rate.toFixed(3)})÷${sz.div}=$${costPerPiece.toFixed(4)}/pc×${qty}+rule $${ruleBase.toFixed(2)}+${rule.markup}% = <strong>$${preTax.toFixed(2)}</strong></div>`);
+  });
+  if(!allValid){warn.classList.remove('hidden');out.classList.add('hidden');return}
+  warn.classList.add('hidden');out.classList.remove('hidden');
+  const tax=grandPre*TAX,grand=grandPre+tax;
+  const c=qSelectedClient;
+  document.getElementById('q-out-name').textContent=c.name;
+  document.getElementById('q-out-details').textContent=[c.phone,c.email,c.address].filter(Boolean).join(' · ');
+  document.getElementById('q-out-date').textContent=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('q-out-jobs').innerHTML=jobOuts.map((j,i)=>`
+    <div class="q-job-block">
+      <div class="q-job-title">Job ${i+1}: ${j.jt}</div>
+      <div class="q-row"><span style="color:var(--text2)">Quantity</span><span style="font-weight:500">${j.qty} units</span></div>
+      <div class="q-row"><span style="color:var(--text2)">Material</span><span style="font-weight:500">${j.mat}</span></div>
+      <div class="q-row"><span style="color:var(--text2)">Size</span><span style="font-weight:500">${j.sz}</span></div>
+      <div class="q-row"><span style="color:var(--text2)">Print type</span><span style="font-weight:500">${j.pp}</span></div>
+      ${j.notes?`<div class="q-row"><span style="color:var(--text2)">Notes</span><span style="font-weight:500;max-width:55%;text-align:right;white-space:normal">${j.notes}</span></div>`:''}
+    </div>`).join('');
+  document.getElementById('q-out-sub').textContent=fmt(grandPre);
+  document.getElementById('q-out-tax').textContent=fmt(tax);
+  document.getElementById('q-out-total').textContent=fmt(grand);
+  document.getElementById('q-internal').innerHTML=intLines.join('');
+}
+function quoteToOrder(){
+  if(!qSelectedClient||!qJobs.length)return;
+  const firstJob=qJobs[0];const jtEl=document.getElementById('qjt-'+firstJob.id);
+  editOId=null;document.getElementById('o-form-title').textContent='New work order (from quote)';
+  document.getElementById('f-client').value=qSelectedClient.name;
+  document.getElementById('f-contact').value=qSelectedClient.phone||'';
+  document.getElementById('f-jobtype').value=jtEl?jtEl.value:'';
+  document.getElementById('f-status').value='Pending';document.getElementById('f-duedate').value='';
+  document.getElementById('f-notes').value='From quote';
+  lineItems=[{id:uid(),desc:'Quote — see details',qty:1,price:parseFloat(document.getElementById('q-out-total').textContent.replace('$',''))||0}];
+  renderLIs();showView('new-order');
+}
+
+// ── PDF ──
+function buildOrderPDF(o){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF({unit:'pt',format:'letter'});
+  const W=612,M=50;let y=M;
+  doc.setFillColor(29,158,117);doc.rect(0,0,W,52,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(16);doc.setFont('helvetica','bold');doc.text('Printmaker IAPP',M,32);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text('Work Order',M,44);
+  doc.text('#'+o.id.toUpperCase().slice(-6),W-M,28,{align:'right'});
+  doc.text(new Date(o.created).toLocaleDateString(),W-M,40,{align:'right'});
+  y=70;doc.setTextColor(20,20,20);doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text(o.client,M,y);y+=15;
+  if(o.contact){doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);doc.text(o.contact,M,y);y+=12}
+  doc.setFontSize(9);doc.setTextColor(100,100,100);
+  if(o.duedate){doc.text('Due: '+o.duedate,M,y);y+=11}
+  doc.text('Job: '+o.jobtype,M,y);y+=11;
+  const sc={'Pending':[186,117,11],'In Progress':[24,95,165],'Completed':[59,109,17],'Cancelled':[163,45,45]};
+  doc.setTextColor(...(sc[o.status]||[100,100,100]));doc.text('Status: '+o.status,M,y);y+=18;
+  if(o.notes){doc.setTextColor(60,60,60);const w=doc.splitTextToSize('Notes: '+o.notes,W-M*2);doc.text(w,M,y);y+=w.length*12+4}
+  doc.setDrawColor(200,200,200);doc.line(M,y,W-M,y);y+=12;
+  doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(120,120,120);
+  doc.text('DESCRIPTION',M,y);doc.text('QTY',310,y);doc.text('UNIT PRICE',378,y);doc.text('SUBTOTAL',W-M,y,{align:'right'});
+  y+=5;doc.line(M,y,W-M,y);y+=11;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(20,20,20);
+  (o.lineItems||[]).forEach(li=>{const sub=(+li.qty)*(+li.price);doc.text(li.desc||'—',M,y,{maxWidth:240});doc.text(String(li.qty),310,y);doc.text(fmt(li.price),378,y);doc.text(fmt(sub),W-M,y,{align:'right'});y+=15});
+  doc.setDrawColor(200,200,200);doc.line(M,y,W-M,y);y+=12;
+  doc.setFontSize(9);doc.setTextColor(100,100,100);doc.text('Subtotal:',W-M-95,y);doc.text(fmt(+o.subtotal||0),W-M,y,{align:'right'});y+=12;
+  doc.text('Tax (11.5%):',W-M-95,y);doc.text(fmt((+o.subtotal||0)*TAX),W-M,y,{align:'right'});y+=12;
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(29,158,117);
+  doc.text('TOTAL:',W-M-95,y);doc.text(fmt(o.total),W-M,y,{align:'right'});
+  y+=26;doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(160,160,160);doc.text('Thank you for your business!',W/2,y,{align:'center'});
+  return doc;
+}
+function exportOrderPDF(){
+  const client=document.getElementById('f-client').value.trim();if(!client){alert('Enter client info first.');return}
+  const sub=calcSub();
+  const o={id:editOId||uid(),client,contact:document.getElementById('f-contact').value.trim(),jobtype:document.getElementById('f-jobtype').value,status:document.getElementById('f-status').value,duedate:document.getElementById('f-duedate').value,notes:document.getElementById('f-notes').value.trim(),lineItems:JSON.parse(JSON.stringify(lineItems)),subtotal:sub,total:sub+sub*TAX,created:Date.now()};
+  buildOrderPDF(o).save('workorder-'+client.replace(/\s+/g,'-')+'.pdf');
+}
+function pdfOrder(id){const o=orders.find(x=>x.id===id);if(!o)return;buildOrderPDF(o).save('workorder-'+o.client.replace(/\s+/g,'-')+'.pdf')}
+function exportQuotePDF(){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF({unit:'pt',format:'letter'});
+  const W=612,M=50;let y=M;
+  const c=qSelectedClient;if(!c)return;
+  const grandTotal=document.getElementById('q-out-total').textContent;
+  const sub=document.getElementById('q-out-sub').textContent;
+  const tax=document.getElementById('q-out-tax').textContent;
+  doc.setFillColor(29,158,117);doc.rect(0,0,W,52,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(16);doc.setFont('helvetica','bold');doc.text('Printmaker IAPP',M,32);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text('Quote / Estimate',M,44);
+  doc.text(new Date().toLocaleDateString(),W-M,40,{align:'right'});
+  y=70;doc.setTextColor(20,20,20);doc.setFontSize(13);doc.setFont('helvetica','bold');doc.text('Quote for: '+c.name,M,y);y+=15;
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
+  if(c.phone){doc.text(c.phone,M,y);y+=11}if(c.email){doc.text(c.email,M,y);y+=11}if(c.address){doc.text(c.address,M,y);y+=11}
+  y+=6;doc.setDrawColor(200,200,200);doc.line(M,y,W-M,y);y+=12;
+  const jobEls=document.querySelectorAll('.q-job-block');
+  jobEls.forEach((el,i)=>{
+    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(20,20,20);doc.text(el.querySelector('.q-job-title').textContent,M,y);y+=13;
+    el.querySelectorAll('.q-row').forEach(row=>{
+      const cells=row.querySelectorAll('span');if(cells.length<2)return;
+      doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);doc.text(cells[0].textContent,M,y);
+      doc.setTextColor(20,20,20);doc.text(cells[1].textContent,W-M,y,{align:'right'});y+=12;
+    });y+=6;
+  });
+  doc.setDrawColor(200,200,200);doc.line(M,y,W-M,y);y+=12;
+  doc.setFontSize(9);doc.setTextColor(100,100,100);doc.text('Subtotal:',W-M-95,y);doc.text(sub,W-M,y,{align:'right'});y+=12;
+  doc.text('Tax (11.5%):',W-M-95,y);doc.text(tax,W-M,y,{align:'right'});y+=12;
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(29,158,117);doc.text('TOTAL:',W-M-95,y);doc.text(grandTotal,W-M,y,{align:'right'});
+  y+=26;doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(160,160,160);doc.text('This is an estimate. Final price may vary.',W/2,y,{align:'center'});
+  doc.save('quote-'+c.name.replace(/\s+/g,'-')+'.pdf');
+}
+
+// ── EXCEL ──
+function triggerImport(target){document.getElementById('xlsx-input').setAttribute('data-target',target);document.getElementById('xlsx-input').click()}
+function handleXlsxFile(input){
+  const file=input.files[0];if(!file)return;
+  const target=input.getAttribute('data-target');
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{const wb=XLSX.read(e.target.result,{type:'array'});if(target==='materials')parseMatsSheet(wb,file.name);else parsePricingSheet(wb,file.name);}
+    catch(err){showBanner(target,'error','Could not read the Excel file.');console.error(err)}
+    input.value='';
+  };reader.readAsArrayBuffer(file);
+}
+function sheetToRows(wb,sheetName){
+  const sheet=wb.Sheets[sheetName];if(!sheet)return null;
+  const raw=XLSX.utils.sheet_to_json(sheet,{header:1,defval:''});if(raw.length<4)return[];
+  const headers=raw[2].map(h=>String(h).trim().toLowerCase());const data=[];
+  for(let i=3;i<raw.length;i++){const row=raw[i];if(row.every(c=>c===''||c===null||c===undefined))continue;const obj={};headers.forEach((h,j)=>{obj[h]=row[j]});data.push(obj)}
+  return data;
+}
+function parseMatsSheet(wb,fname){
+  const rows=sheetToRows(wb,'Materials');
+  if(rows===null){showBanner('materials','error','Sheet "Materials" not found.');return}
+  const parsed=rows.map(r=>({id:uid(),name:String(r['name']||'').trim(),category:String(r['category']||'Other').trim(),unit:String(r['unit']||'piece').trim(),size:String(r['size']||'').trim(),cost:parseFloat(r['cost per unit ($)']||r['cost']||0)||0,stock:parseInt(r['stock quantity']||r['stock']||0)||0,reorder:parseInt(r['reorder level']||r['reorder']||0)||0})).filter(r=>r.name);
+  if(!parsed.length){showBanner('materials','error','No valid rows found.');return}
+  pendingImport={type:'materials',data:parsed};showImportModal('materials',parsed,fname);
+}
+function parsePricingSheet(wb,fname){
+  const rows=sheetToRows(wb,'Pricing Rules');
+  if(rows===null){showBanner('pricing','error','Sheet "Pricing Rules" not found.');return}
+  const parsed=rows.map(r=>({id:uid(),name:String(r['rule name']||r['name']||'').trim(),jobtype:String(r['job type']||'').trim(),base:parseFloat(r['base price ($)']||0)||0,perunit:parseFloat(r['price per unit ($)']||0)||0,minqty:parseInt(r['min quantity']||1)||1,markup:parseFloat(r['markup %']||0)||0,notes:String(r['notes']||'').trim()})).filter(r=>r.name);
+  if(!parsed.length){showBanner('pricing','error','No valid rows found.');return}
+  pendingImport={type:'pricing',data:parsed};showImportModal('pricing',parsed,fname);
+}
+function showImportModal(type,data,fname){
+  const isM=type==='materials';
+  document.getElementById('modal-title').textContent=`Import ${isM?'materials':'pricing rules'} from ${fname}`;
+  const preview=data.slice(0,6);const more=data.length>6?`<p style="font-size:11px;color:var(--text3);margin-top:8px">… and ${data.length-6} more rows</p>`:'';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="banner banner-success" style="margin-bottom:14px"><i class="ti ti-table-import"></i><span><strong>${data.length} rows</strong> ready from <em>${fname}</em>. Existing ${isM?'materials':'pricing rules'} will be replaced.</span></div>
+    ${preview.map(r=>isM?`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="font-weight:500">${r.name}</span><span style="color:var(--text2)">${r.category} · ${r.unit}${r.size?' · '+r.size:''} · $${r.cost.toFixed(3)}</span></div>`:`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="font-weight:500">${r.name}</span><span style="color:var(--text2)">${r.jobtype||'Any'} · $${r.base.toFixed(2)} · ${r.markup}%</span></div>`).join('')}${more}`;
+  document.getElementById('import-modal').classList.remove('hidden');
+}
+function confirmImport(){
+  if(!pendingImport)return;
+  if(pendingImport.type==='materials'){materials=pendingImport.data;dbSet(DB.mats,materials);renderMats();showBanner('materials','success',`${materials.length} materials imported.`)}
+  else{pricing=pendingImport.data;dbSet(DB.pricing,pricing);renderP();showBanner('pricing','success',`${pricing.length} pricing rules imported.`)}
+  pendingImport=null;closeModal();
+}
+function closeModal(){document.getElementById('import-modal').classList.add('hidden')}
+function showBanner(view,type,msg){
+  const id=view==='materials'?'mat-banner':'pricing-banner';const el=document.getElementById(id);
+  el.className='banner '+(type==='success'?'banner-success':'banner-error');
+  el.innerHTML=`<i class="ti ti-${type==='success'?'check':'alert-circle'}"></i><span>${msg}</span>`;
+  el.classList.remove('hidden');if(type==='success')setTimeout(()=>el.classList.add('hidden'),5000);
+}
+function exportMatsExcel(){
+  if(!materials.length){alert('No materials to export.');return}
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([['Printmaker IAPP — Material Database'],['Blue values are editable inputs.'],['Name','Category','Unit','Size','Cost per unit ($)','Stock quantity','Reorder level'],...materials.map(m=>[m.name,m.category,m.unit,m.size||'',m.cost,m.stock,m.reorder])]);
+  ws['!cols']=[{wch:28},{wch:18},{wch:10},{wch:14},{wch:18},{wch:15},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws,'Materials');addPricingSheetXL(wb);XLSX.writeFile(wb,'Printmaker_IAPP_Materials.xlsx');
+}
+function exportPricingExcel(){
+  if(!pricing.length){alert('No pricing rules to export.');return}
+  const wb=XLSX.utils.book_new();addMatsSheetXL(wb);addPricingSheetXL(wb);XLSX.writeFile(wb,'Printmaker_IAPP_Pricing.xlsx');
+}
+function addMatsSheetXL(wb){
+  const ws=XLSX.utils.aoa_to_sheet([['Printmaker IAPP — Material Database'],[''],['Name','Category','Unit','Size','Cost per unit ($)','Stock quantity','Reorder level'],...materials.map(m=>[m.name,m.category,m.unit,m.size||'',m.cost,m.stock,m.reorder])]);
+  XLSX.utils.book_append_sheet(wb,ws,'Materials');
+}
+function addPricingSheetXL(wb){
+  const ws=XLSX.utils.aoa_to_sheet([['Printmaker IAPP — Pricing Rules'],[''],['Rule name','Job type','Base price ($)','Price per unit ($)','Min quantity','Markup %','Notes'],...pricing.map(p=>[p.name,p.jobtype||'',p.base,p.perunit,p.minqty||1,p.markup||0,p.notes||''])]);
+  XLSX.utils.book_append_sheet(wb,ws,'Pricing Rules');
+}
+
+init();
+addQJob();
+</script>
+</body>
+</html>
